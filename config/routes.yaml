@@ -3,3 +3,14 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+
+photo_index:
+    path: /photos
+    controller: App\Controller\PhotoController::index
+
+photos_new:
+    path: /photos/new
+    controller: App\Controller\PhotoController::new
+
+

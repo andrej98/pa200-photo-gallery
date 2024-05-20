@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Photo Gallery{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Gallery styles */
+        body {
+            background-color: #f7f7f7; /* Set your desired background color */
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .photo {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .photo img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .photo:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Upload button styles */
+        .upload-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .upload-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h1>Photo Gallery</h1>
+    <a href="{{ path('photo_new') }}" class="upload-btn">Upload a new photo</a>
+
+    <div class="gallery">
+        {% for photo in photos %}
+            <div class="photo">
+                <img src="{{ asset(photo.url) }}" alt="{{ photo.name }}">
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

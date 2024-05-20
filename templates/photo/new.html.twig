@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upload New Photo{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Form container */
+        .form-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form title */
+        .form-title {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Form fields */
+        .form-field {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Upload button */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="form-container">
+        <h1 class="form-title">Upload New Photo</h1>
+
+        {{ form_start(form) }}
+            <div class="form-field">
+                {{ form_label(form.file, 'Choose File', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.file, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <div class="form-field">
+                {{ form_label(form.name, 'Name', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.name, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <div class="form-field">
+                {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <button type="submit" class="btn">Upload</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
