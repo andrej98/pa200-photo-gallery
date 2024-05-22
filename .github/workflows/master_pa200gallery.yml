@@ -45,7 +45,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az storage blob upload-batch -d $AZURE_CONTAINER_NAME --account-name $AZURE_STORAGE_ACCOUNT -s public/build
+            az storage blob upload-batch -d $AZURE_CONTAINER_NAME/build --account-name $AZURE_STORAGE_ACCOUNT -s public/build
       # - name: Upload assets to Azure Blob Storage
       #   env:
       #     AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
