@@ -5,8 +5,9 @@ framework:
 
     # Note that the session will be started ONLY if you read or write from it.
     session: true
+    
     assets:
-        base_urls: 'https://your-storage-account-name.blob.core.windows.net/your-container-name'
+        base_urls: 'https://pa200blob.blob.core.windows.net/web'
 
     #esi: true
     #fragments: true
