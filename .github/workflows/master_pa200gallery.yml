@@ -36,6 +36,17 @@ jobs:
 
       - name: Build assets
         run: yarn encore production
+      
+      - name: Install Azure CLI
+        uses: azure/CLI@v1
+
+      - name: Upload assets to Azure Blob Storage
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+        run: |
+          az storage blob upload-batch -d $AZURE_CONTAINER_NAME --account-name $AZURE_STORAGE_ACCOUNT -s public/build
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
