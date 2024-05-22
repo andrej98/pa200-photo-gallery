@@ -8,8 +8,8 @@ doctrine:
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
-        options:
-            !php/const PDO::MYSQL_ATTR_SSL_CA: '%ca_cert%'
+        # options:
+        #     !php/const PDO::MYSQL_ATTR_SSL_CA: '%ca_cert%'
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Photo;
 use App\Form\PhotoType;
 use Doctrine\ORM\EntityManagerInterface;
+use MicrosoftAzure\Storage\Blob\BlobRestProxy;
+use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +26,7 @@ class PhotoController extends AbstractController
         ]);
     }
 
+
     #[Route('/photos/new', name: 'photo_new')]
     public function new(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
@@ -37,23 +40,38 @@ class PhotoController extends AbstractController
             $description = $form->get('description')->getData();
 
             if ($file) {
-                // $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($name);
-                // $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
-                // Save file to the uploads directory (you will implement the logic)
-                // $file->move($this->getParameter('uploads_directory'), $newFilename);
+                // Get Azure Blob Storage credentials from environment variables
+                $accountName = $_ENV['AZURE_STORAGE_ACCOUNT'];
+                $accountKey = $_ENV['AZURE_STORAGE_KEY'];
+                $containerName = $_ENV['AZURE_STORAGE_CONTAINER'];
 
-                $url = 'https://';
+                // Create Blob client
+                $blobClient = BlobRestProxy::createBlobService(
+                    sprintf('DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s', $accountName, $accountKey)
+                );
 
-                // Update the photo entity
-                $photo->setName($name);
-                $photo->setDescription($description);
-                $photo->setUrl($url);
-                $em->persist($photo);
-                $em->flush();
+                try {
+                    // Upload blob to container
+                    $content = file_get_contents($file->getPathname());
+                    $blobClient->createBlockBlob($containerName, $newFilename, $content);
 
-                return $this->redirectToRoute('photo_index');
+                    // Get URL of the uploaded file
+                    $url = sprintf('https://%s.blob.core.windows.net/%s/%s', $accountName, $containerName, $newFilename);
+
+                    // Update the photo entity
+                    $photo->setName($name);
+                    $photo->setDescription($description);
+                    $photo->setUrl($url);
+                    $em->persist($photo);
+                    $em->flush();
+
+                    return $this->redirectToRoute('photo_index');
+                } catch (ServiceException $e) {
+                    $this->addFlash('error', 'Failed to upload image to Azure Blob Storage.');
+                }
             }
         }
 
