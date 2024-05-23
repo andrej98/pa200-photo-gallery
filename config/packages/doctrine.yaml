@@ -44,9 +44,9 @@ when@prod:
             result_cache_driver:
                 type: pool
                 pool: doctrine.result_cache_pool
-        # dbal:
-        #     options:
-        #         !php/const PDO::MYSQL_ATTR_SSL_CA: '%ca_cert%'
+        dbal:
+            options:
+                !php/const PDO::MYSQL_ATTR_SSL_CA: '%ca_cert%'
 
 
     framework:
