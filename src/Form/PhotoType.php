@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class PhotoType extends AbstractType
 {
@@ -15,9 +16,21 @@ class PhotoType extends AbstractType
     {
         $builder
             ->add('file', FileType::class, [
-                'label' => 'Photo File',
+                'label' => 'Photo (JPEG, PNG, GIF, webp file)',
                 'mapped' => false,
                 'required' => true,
+                'constraints' => [
+                    new File([
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                            'image/webp',
+                            'image/jpg'
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image file (JPEG, PNG, GIF, webp)',
+                    ])
+                ],
             ])
             ->add('name', TextType::class, [
                 'label' => 'Name',
