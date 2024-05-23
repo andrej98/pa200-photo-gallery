@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ photo.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .photo-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 40%; /* Make the image container one-third of the screen width */
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .photo-details {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .delete-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="photo-container">
+        <h1>{{ photo.name }}</h1>
+        <img src="{{ photo.url }}" alt="{{ photo.name }}">
+        <div class="photo-details">
+            <p>{{ photo.description }}</p>
+        </div>
+        <div class="delete-form">
+            <form method="post" action="{{ path('photo_delete', {'id': photo.id}) }}" onsubmit="return confirm('Are you sure you want to delete this photo?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ photo.id) }}">
+                <button class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

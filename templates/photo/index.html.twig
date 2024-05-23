@@ -1,19 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Photo Gallery{% endblock %}
+{% block title %}Public Photo Gallery{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        /* Gallery styles */
-        body {
-            background-color: #f7f7f7; /* Set your desired background color */
-        }
-
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
+            padding-top: 20px;
         }
 
         .photo {
@@ -21,6 +17,7 @@
             overflow: hidden;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         .photo img {
@@ -48,17 +45,34 @@
         .upload-btn:hover {
             background-color: #45a049;
         }
+
+        .photo-details {
+            margin-top: 10px;
+        }
+
+        .photo-actions {
+            margin-top: 10px;
+        }
+
+        .photo-actions a, .photo-actions form {
+            display: inline-block;
+        }
     </style>
 {% endblock %}
 
 {% block body %}
-    <h1>Photo Gallery</h1>
+    <h1>Public Photo Gallery</h1>
     <a href="{{ path('photo_new') }}" class="upload-btn">Upload a new photo</a>
 
     <div class="gallery">
         {% for photo in photos %}
             <div class="photo">
-                <img src="{{ asset(photo.url) }}" alt="{{ photo.name }}">
+                <a href="{{ path('photo_show', {'id': photo.id}) }}">
+                    <img src="{{ photo.url }}" alt="{{ photo.name }}">
+                    <div class="photo-details">
+                        <p>{{ photo.name }}</p>
+                    </div>
+                </a>
             </div>
         {% endfor %}
     </div>

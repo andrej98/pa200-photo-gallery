@@ -79,4 +79,40 @@ class PhotoController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/photos/{id}', name: 'photo_show', methods: ['GET'])]
+    public function show(Photo $photo): Response
+    {
+        return $this->render('photo/show.html.twig', [
+            'photo' => $photo,
+        ]);
+    }
+
+    #[Route('/photos/{id}/delete', name: 'photo_delete', methods: ['POST'])]
+    public function delete(Request $request, Photo $photo, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $photo->getId(), $request->request->get('_token'))) {
+            // Delete the photo from Azure Blob Storage
+            $accountName = $_ENV['AZURE_STORAGE_ACCOUNT'];
+            $accountKey = $_ENV['AZURE_STORAGE_KEY'];
+            $containerName = $_ENV['AZURE_STORAGE_CONTAINER'];
+
+            $blobClient = BlobRestProxy::createBlobService(
+                sprintf('DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s', $accountName, $accountKey)
+            );
+
+            try {
+                $blobClient->deleteBlob($containerName, basename($photo->getUrl()));
+            } catch (ServiceException $e) {
+                $this->addFlash('error', 'Failed to delete image from Azure Blob Storage.');
+            }
+
+            $em->remove($photo);
+            $em->flush();
+
+            $this->addFlash('success', 'Photo deleted successfully.');
+        }
+
+        return $this->redirectToRoute('photo_index');
+    }
 }
