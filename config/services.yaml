@@ -20,5 +20,18 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Messenger\Transport\AzureServiceBusTransport:
+        arguments:
+            $endpoint: '%env(AZURE_SERVICE_BUS_ENDPOINT)%'
+            $sasKeyName: '%env(AZURE_SERVICE_BUS_SAS_KEY_NAME)%'
+            $sasKeyValue: '%env(AZURE_SERVICE_BUS_SAS_KEY_VALUE)%'
+            $queue: '%env(AZURE_SERVICE_BUS_QUEUE)%'
+            $serializer: 'messenger.transport.symfony_serializer'
+    
+    Symfony\Component\Messenger\Transport\TransportInterface: '@App\Messenger\Transport\AzureServiceBusTransport'
+
+    App\Messenger\Transport\AzureServiceBusTransportFactory:
+        tags: ['messenger.transport_factory']
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Photo;
 use App\Form\PhotoType;
+use App\Message\ImageToProcess;
 use Doctrine\ORM\EntityManagerInterface;
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -28,7 +30,7 @@ class PhotoController extends AbstractController
 
 
     #[Route('/photos/new', name: 'photo_new')]
-    public function new(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    public function new(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, MessageBusInterface $bus): Response
     {
         $photo = new Photo();
         $form = $this->createForm(PhotoType::class, $photo);
@@ -67,6 +69,9 @@ class PhotoController extends AbstractController
                     $photo->setUrl($url);
                     $em->persist($photo);
                     $em->flush();
+
+                    $message = new ImageToProcess($photo->getId());
+                    $bus->dispatch($message);
 
                     return $this->redirectToRoute('photo_index');
                 } catch (ServiceException $e) {

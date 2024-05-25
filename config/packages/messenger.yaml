@@ -1,18 +1,17 @@
 framework:
     messenger:
-        failure_transport: failed
+        # failure_transport: failed
 
         transports:
-            # https://symfony.com/doc/current/messenger.html#transport-configuration
-            async:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+            azure_service_bus:
+                serializer: messenger.transport.symfony_serializer
+                dsn: 'custom://'
                 options:
-                    use_notify: true
-                    check_delayed_interval: 60000
-                retry_strategy:
-                    max_retries: 3
-                    multiplier: 2
-            failed: 'doctrine://default?queue_name=failed'
+                    endpoint: '%env(AZURE_SERVICE_BUS_ENDPOINT)%'
+                    sasKeyName: '%env(AZURE_SERVICE_BUS_SAS_KEY_NAME)%'
+                    sasKeyValue: '%env(AZURE_SERVICE_BUS_SAS_KEY_VALUE)%'
+                    queue: '%env(AZURE_SERVICE_BUS_QUEUE)%'
+            # failed: 'doctrine://default?queue_name=failed'xs
             # sync: 'sync://'
 
         default_bus: messenger.bus.default
@@ -21,9 +20,4 @@ framework:
             messenger.bus.default: []
 
         routing:
-            Symfony\Component\Mailer\Messenger\SendEmailMessage: async
-            Symfony\Component\Notifier\Message\ChatMessage: async
-            Symfony\Component\Notifier\Message\SmsMessage: async
-
-            # Route your messages to the transports
-            # 'App\Message\YourMessage': async
+            'App\Message\ImageToProcess': azure_service_bus
