@@ -108,6 +108,9 @@ class PhotoController extends AbstractController
 
             try {
                 $blobClient->deleteBlob($containerName, basename($photo->getUrl()));
+                if($photo->getBwUrl()) {
+                    $blobClient->deleteBlob($containerName, basename($photo->getBwUrl()));
+                }
             } catch (ServiceException $e) {
                 $this->addFlash('error', 'Failed to delete image from Azure Blob Storage.');
             }

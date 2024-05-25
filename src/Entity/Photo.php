@@ -22,6 +22,9 @@ class Photo
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $bwUrl = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -47,6 +50,18 @@ class Photo
     public function setUrl(string $url): static
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    public function getBwUrl(): ?string
+    {
+        return $this->bwUrl;
+    }
+
+    public function setBwUrl(?string $bwUrl): static
+    {
+        $this->bwUrl = $bwUrl;
 
         return $this;
     }
