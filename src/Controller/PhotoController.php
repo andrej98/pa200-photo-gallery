@@ -11,7 +11,9 @@ use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -71,7 +73,8 @@ class PhotoController extends AbstractController
                     $em->flush();
 
                     $message = new ImageToProcess($photo->getId());
-                    $bus->dispatch($message);
+                    $envelope = new Envelope($message, [new DelayStamp($_ENV['AZURE_SERVICE_BUS_MESSAGE_DELAY'])]); 
+                    $bus->dispatch($envelope);
 
                     return $this->redirectToRoute('photo_index');
                 } catch (ServiceException $e) {
