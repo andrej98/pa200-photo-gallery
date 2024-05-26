@@ -2,6 +2,7 @@
 
 namespace App\Messenger\Transport;
 
+use DateTime;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -24,15 +25,15 @@ class AzureServiceBusTransport implements TransportInterface, SenderInterface
         $this->serializer = $serializer;
     }
 
-    public function send(Envelope $envelope): Envelope
+    public function send(Envelope $envelope, int $delaySeconds = 0): Envelope
     {
         $message = $this->serializer->encode($envelope)['body'];
-        $this->sendMessage($message);
+        $this->sendMessage($message, $delaySeconds);
 
         return $envelope;
     }
 
-    private function sendMessage($message)
+    private function sendMessage($message, int $delaySeconds)
     {
         $resourceUri = "https://{$this->endpoint}.servicebus.windows.net/{$this->queue}/messages";
         $sasToken = $this->createSasToken($resourceUri);
@@ -41,6 +42,11 @@ class AzureServiceBusTransport implements TransportInterface, SenderInterface
             'Authorization: ' . $sasToken,
             'Content-Type: application/atom+xml;type=entry;charset=utf-8',
         ];
+
+        if ($delaySeconds > 0) {
+            $scheduledEnqueueTimeUtc = (new DateTime())->modify("+{$delaySeconds} seconds")->format(DateTime::ATOM);
+            $headers['BrokerProperties'] = json_encode(['ScheduledEnqueueTimeUtc' => $scheduledEnqueueTimeUtc]);
+        }
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $resourceUri);
